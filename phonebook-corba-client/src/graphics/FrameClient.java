@@ -43,6 +43,8 @@ public class FrameClient {
 	private DefaultTableModel model;
 	private JTextField textFieldNameContact;
 	private JTextField textFieldNumberContact;
+	private JButton btnAtualizar;
+	private JButton btnDeletar;
 	/**
 	 * Launch the application.
 	 */
@@ -122,6 +124,8 @@ public class FrameClient {
 				int row = table.getSelectedRow();
 				textFieldNameContact.setText(model.getValueAt(row, 0).toString());
 				textFieldNumberContact.setText(model.getValueAt(row, 1).toString());
+				btnAtualizar.setEnabled(true);
+				btnDeletar.setEnabled(true);
 			}
 		});
 		table.setModel(model);
@@ -198,7 +202,8 @@ public class FrameClient {
 		btnAdicionar.setBounds(6, 153, 90, 28);
 		panelContact.add(btnAdicionar);
 
-		JButton btnAtualizar = new JButton("Atualizar");
+		btnAtualizar = new JButton("Atualizar");
+		btnAtualizar.setEnabled(false);
 		btnAtualizar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int contactNumber = 0;
@@ -208,18 +213,24 @@ public class FrameClient {
 					e.printStackTrace();
 				}
 				client.updateContact(textFieldNameContact.getText(),contactNumber, model.getValueAt(table.getSelectedRow(), 0).toString(), Integer.parseInt(model.getValueAt(table.getSelectedRow(), 1).toString()));
+				btnAtualizar.setEnabled(false);
+				btnDeletar.setEnabled(false);
 				textFieldNameContact.setText(null);
 				textFieldNumberContact.setText(null);
+				
 			}
 		});
 		btnAtualizar.setBounds(102, 153, 90, 28);
 		panelContact.add(btnAtualizar);
 
-		JButton btnDeletar = new JButton("Deletar");
+		btnDeletar = new JButton("Deletar");
+		btnDeletar.setEnabled(false);
 		btnDeletar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				client.deleteContact(textFieldNameContact.getText());
 				model.removeRow(table.getSelectedRow());
+				btnAtualizar.setEnabled(false);
+				btnDeletar.setEnabled(false);
 				textFieldNameContact.setText(null);
 				textFieldNumberContact.setText(null);
 			}

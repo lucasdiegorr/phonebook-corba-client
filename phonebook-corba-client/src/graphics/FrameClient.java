@@ -13,6 +13,7 @@ import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.MaskFormatter;
 
 import controller.PhoneBookClient;
 
@@ -28,8 +29,12 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.TreeMap;
+
+import javax.swing.JFormattedTextField;
+import javax.swing.SwingConstants;
 
 /**
  * @author Lucas Diego Reboucas Rocha
@@ -43,11 +48,11 @@ public class FrameClient {
 	private PhoneBookClient client;
 	private DefaultTableModel model;
 	private JTextField textFieldNameContact;
-	private JTextField textFieldNumberContact;
 	private JButton btnAtualizar;
 	private JButton btnDeletar;
 	private JLabel lblLastUpdate;
 	private JLabel label;
+	private JFormattedTextField formattedNumberTextField;
 	/**
 	 * Launch the application.
 	 */
@@ -126,7 +131,7 @@ public class FrameClient {
 			public void mouseClicked(MouseEvent arg0) {
 				int row = table.getSelectedRow();
 				textFieldNameContact.setText(model.getValueAt(row, 0).toString());
-				textFieldNumberContact.setText(model.getValueAt(row, 1).toString());
+				formattedNumberTextField.setText(model.getValueAt(row, 1).toString());
 				btnAtualizar.setEnabled(true);
 				btnDeletar.setEnabled(true);
 			}
@@ -143,7 +148,7 @@ public class FrameClient {
 
 		JPanel panelContact = new JPanel();
 		panelContact.setBorder(new TitledBorder(null, "Contato", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelContact.setBounds(6, 25, 199, 236);
+		panelContact.setBounds(6, 25, 199, 229);
 		frame.getContentPane().add(panelContact);
 		panelContact.setLayout(null);
 
@@ -160,11 +165,6 @@ public class FrameClient {
 		lblNumberContact.setBounds(6, 89, 55, 16);
 		panelContact.add(lblNumberContact);
 
-		textFieldNumberContact = new JTextField();
-		textFieldNumberContact.setBounds(6, 110, 186, 31);
-		panelContact.add(textFieldNumberContact);
-		textFieldNumberContact.setColumns(10);
-
 		JButton btnAdicionar = new JButton("Adicionar");
 		btnAdicionar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -173,7 +173,7 @@ public class FrameClient {
 					String contactName = textFieldNameContact.getText();
 					int contactNumber = 0;
 					try {
-						contactNumber = Integer.parseInt(textFieldNumberContact.getText());
+						contactNumber = Integer.parseInt(formattedNumberTextField.getText().replace("-", ""));
 					} catch (NumberFormatException e) {
 						JOptionPane.showMessageDialog(null, "Por favor insira um telefone válido.\n Somente números.");
 						return;
@@ -182,7 +182,7 @@ public class FrameClient {
 					if (verifyContact(contactName,contactNumber)) {
 						client.insertContact(contactName, contactNumber);
 						String[] values = { textFieldNameContact.getText(),
-								textFieldNumberContact.getText() };
+								formattedNumberTextField.getText() };
 						model.addRow(values);
 						refreshTable();
 					}
@@ -191,7 +191,7 @@ public class FrameClient {
 					JOptionPane.showMessageDialog(null, "Por favor digite um nome não nulo.");
 				}
 				textFieldNameContact.setText(null);
-				textFieldNumberContact.setText(null);
+				formattedNumberTextField.setText(null);
 			}
 
 			private boolean verifyContact(String contactName, int contactNumber) {
@@ -203,7 +203,7 @@ public class FrameClient {
 				}
 			}
 		});
-		btnAdicionar.setBounds(6, 153, 90, 28);
+		btnAdicionar.setBounds(6, 157, 90, 28);
 		panelContact.add(btnAdicionar);
 
 		btnAtualizar = new JButton("Atualizar");
@@ -212,7 +212,7 @@ public class FrameClient {
 			public void actionPerformed(ActionEvent arg0) {
 				int contactNumber = 00000000;
 				try {
-					contactNumber = Integer.parseInt(textFieldNumberContact.getText());
+					contactNumber = Integer.parseInt(formattedNumberTextField.getText().replace("-", ""));
 				} catch (NumberFormatException e) {
 					JOptionPane.showMessageDialog(null, "Por favor digite um valor valido como telefone.\nSomente números.");
 					return;
@@ -225,11 +225,11 @@ public class FrameClient {
 				btnAtualizar.setEnabled(false);
 				btnDeletar.setEnabled(false);
 				textFieldNameContact.setText(null);
-				textFieldNumberContact.setText(null);
+				formattedNumberTextField.setText(null);
 
 			}
 		});
-		btnAtualizar.setBounds(102, 153, 90, 28);
+		btnAtualizar.setBounds(102, 157, 90, 28);
 		panelContact.add(btnAtualizar);
 
 		btnDeletar = new JButton("Deletar");
@@ -241,18 +241,32 @@ public class FrameClient {
 				btnAtualizar.setEnabled(false);
 				btnDeletar.setEnabled(false);
 				textFieldNameContact.setText(null);
-				textFieldNumberContact.setText(null);
+				formattedNumberTextField.setText(null);
 			}
 		});
-		btnDeletar.setBounds(54, 189, 90, 28);
+		btnDeletar.setBounds(54, 193, 90, 28);
 		panelContact.add(btnDeletar);
+		
+		MaskFormatter phoneMask = null;
+		
+		try {
+			phoneMask = new MaskFormatter("####-####");
+			phoneMask.setPlaceholderCharacter(' ');
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		formattedNumberTextField = new JFormattedTextField(phoneMask);
+		formattedNumberTextField.setHorizontalAlignment(SwingConstants.CENTER);
+		formattedNumberTextField.setBounds(6, 117, 186, 28);
+		panelContact.add(formattedNumberTextField);
 
-		lblLastUpdate = new JLabel("Atualizado:");
-		lblLastUpdate.setBounds(16, 274, 98, 16);
+		lblLastUpdate = new JLabel("Atualizado em:");
+		lblLastUpdate.setBounds(17, 264, 98, 16);
 		frame.getContentPane().add(lblLastUpdate);
 		
 		label = new JLabel("");
-		label.setBounds(16, 302, 185, 16);
+		label.setBounds(17, 292, 185, 16);
 		frame.getContentPane().add(label);
 	}
 

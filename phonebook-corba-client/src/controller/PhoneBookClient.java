@@ -147,7 +147,6 @@ public class PhoneBookClient implements Runnable{
 		} catch (Exception e) {
 			init();
 			synchronizeList();
-			e.printStackTrace();
 		}
 	}
 

@@ -28,6 +28,7 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Date;
 import java.util.TreeMap;
 
 /**
@@ -45,6 +46,8 @@ public class FrameClient {
 	private JTextField textFieldNumberContact;
 	private JButton btnAtualizar;
 	private JButton btnDeletar;
+	private JLabel lblLastUpdate;
+	private JLabel label;
 	/**
 	 * Launch the application.
 	 */
@@ -165,14 +168,15 @@ public class FrameClient {
 		JButton btnAdicionar = new JButton("Adicionar");
 		btnAdicionar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+
 				if (!textFieldNameContact.getText().equals("") && !textFieldNameContact.getText().isEmpty()) {
 					String contactName = textFieldNameContact.getText();
 					int contactNumber = 0;
 					try {
 						contactNumber = Integer.parseInt(textFieldNumberContact.getText());
 					} catch (NumberFormatException e) {
-						e.printStackTrace();
+						JOptionPane.showMessageDialog(null, "Por favor insira um telefone válido.\n Somente números.");
+						return;
 					}
 
 					if (verifyContact(contactName,contactNumber)) {
@@ -206,18 +210,23 @@ public class FrameClient {
 		btnAtualizar.setEnabled(false);
 		btnAtualizar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int contactNumber = 0;
+				int contactNumber = 00000000;
 				try {
 					contactNumber = Integer.parseInt(textFieldNumberContact.getText());
 				} catch (NumberFormatException e) {
-					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Por favor digite um valor valido como telefone.\nSomente números.");
+					return;
+				}
+				if (textFieldNameContact.getText() == "" || textFieldNameContact.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Por favor digite um nome valido como nome do contato.");
+					return;
 				}
 				client.updateContact(textFieldNameContact.getText(),contactNumber, model.getValueAt(table.getSelectedRow(), 0).toString(), Integer.parseInt(model.getValueAt(table.getSelectedRow(), 1).toString()));
 				btnAtualizar.setEnabled(false);
 				btnDeletar.setEnabled(false);
 				textFieldNameContact.setText(null);
 				textFieldNumberContact.setText(null);
-				
+
 			}
 		});
 		btnAtualizar.setBounds(102, 153, 90, 28);
@@ -237,6 +246,14 @@ public class FrameClient {
 		});
 		btnDeletar.setBounds(54, 189, 90, 28);
 		panelContact.add(btnDeletar);
+
+		lblLastUpdate = new JLabel("Atualizado:");
+		lblLastUpdate.setBounds(16, 274, 98, 16);
+		frame.getContentPane().add(lblLastUpdate);
+		
+		label = new JLabel("");
+		label.setBounds(16, 302, 185, 16);
+		frame.getContentPane().add(label);
 	}
 
 	/**
@@ -245,7 +262,6 @@ public class FrameClient {
 	private void refreshTable() {
 
 		TreeMap<String, Integer> list = client.getListContacts();
-		System.out.println("Tem " + model.getRowCount());
 		int count = model.getRowCount();
 		for (int i = count-1; i >= 0; i--) {
 			model.removeRow(i);
@@ -257,6 +273,10 @@ public class FrameClient {
 
 	}
 
+	/**
+	 * @author Lucas Diego Reboucas Rocha
+	 *
+	 */
 	private class ScheduledTask implements Runnable {
 		public void run() {
 			while (true) {
@@ -268,6 +288,7 @@ public class FrameClient {
 				if (client.isChanged()) {
 					client.setChanged(false);
 					refreshTable();
+					label.setText(""+new Date());
 				}
 			}
 		}

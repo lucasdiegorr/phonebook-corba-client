@@ -84,16 +84,12 @@ public class PhoneBookClient implements Runnable{
 
 			} catch (InvalidName e) {
 				index++;
-				e.printStackTrace();
 			} catch (NotFound e) {
 				index++;
-				e.printStackTrace();
 			} catch (CannotProceed e) {
 				index++;
-				e.printStackTrace();
 			} catch (org.omg.CosNaming.NamingContextPackage.InvalidName e) {
 				index++;
-				e.printStackTrace();
 			}
 		} while ((objectInterface == null) && (index  < 3));
 

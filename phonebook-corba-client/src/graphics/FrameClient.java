@@ -35,6 +35,7 @@ import java.util.TreeMap;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingConstants;
+import java.awt.Font;
 
 /**
  * @author Lucas Diego Reboucas Rocha
@@ -83,9 +84,14 @@ public class FrameClient {
 	 */
 	public FrameClient() {
 		initialize();
-		this.client = new PhoneBookClient(JOptionPane.showInputDialog("Intruduza o endereço no Servidor:"));
+		String ipAddress = null;
+		do {
+			ipAddress = JOptionPane.showInputDialog("Intruduza o endereço no Servidor:");
+		} while ((ipAddress.equals("")) || (ipAddress.isEmpty()) ||(ipAddress == null));
+		this.client = new PhoneBookClient(ipAddress);
 		if (!client.init()) {
 			JOptionPane.showMessageDialog(null, "Não foi possível contactar o servidor.\nPor favor verifique sua conexão e o endereço fornecido.");
+			System.exit(0);
 		}
 		new Thread(client).start();
 		refreshTable();
@@ -274,6 +280,7 @@ public class FrameClient {
 		frame.getContentPane().add(lblLastUpdate);
 		
 		label = new JLabel("");
+		label.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		label.setBounds(17, 292, 185, 16);
 		frame.getContentPane().add(label);
 	}

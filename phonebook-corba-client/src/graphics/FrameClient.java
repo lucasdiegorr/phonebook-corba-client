@@ -52,7 +52,7 @@ public class FrameClient {
 	private JButton btnDeletar;
 	private JLabel lblLastUpdate;
 	private JLabel label;
-	private JFormattedTextField formattedNumberTextField;
+	private JFormattedTextField formattedTextField;
 	/**
 	 * Launch the application.
 	 */
@@ -97,6 +97,14 @@ public class FrameClient {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.getContentPane().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				table.clearSelection();
+				textFieldNameContact.setText(null);
+				formattedTextField.setText(null);
+			}
+		});
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 450, 480);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -131,7 +139,7 @@ public class FrameClient {
 			public void mouseClicked(MouseEvent arg0) {
 				int row = table.getSelectedRow();
 				textFieldNameContact.setText(model.getValueAt(row, 0).toString());
-				formattedNumberTextField.setText(model.getValueAt(row, 1).toString());
+				formattedTextField.setText(model.getValueAt(row, 1).toString());
 				btnAtualizar.setEnabled(true);
 				btnDeletar.setEnabled(true);
 			}
@@ -173,7 +181,7 @@ public class FrameClient {
 					String contactName = textFieldNameContact.getText();
 					int contactNumber = 0;
 					try {
-						contactNumber = Integer.parseInt(formattedNumberTextField.getText().replace("-", ""));
+						contactNumber = Integer.parseInt(formattedTextField.getText().replace("-", ""));
 					} catch (NumberFormatException e) {
 						JOptionPane.showMessageDialog(null, "Por favor insira um telefone válido.\n Somente números.");
 						return;
@@ -182,7 +190,7 @@ public class FrameClient {
 					if (verifyContact(contactName,contactNumber)) {
 						client.insertContact(contactName, contactNumber);
 						String[] values = { textFieldNameContact.getText(),
-								formattedNumberTextField.getText() };
+								formattedTextField.getText() };
 						model.addRow(values);
 						refreshTable();
 					}
@@ -191,7 +199,7 @@ public class FrameClient {
 					JOptionPane.showMessageDialog(null, "Por favor digite um nome não nulo.");
 				}
 				textFieldNameContact.setText(null);
-				formattedNumberTextField.setText(null);
+				formattedTextField.setText(null);
 			}
 
 			private boolean verifyContact(String contactName, int contactNumber) {
@@ -212,7 +220,7 @@ public class FrameClient {
 			public void actionPerformed(ActionEvent arg0) {
 				int contactNumber = 00000000;
 				try {
-					contactNumber = Integer.parseInt(formattedNumberTextField.getText().replace("-", ""));
+					contactNumber = Integer.parseInt(formattedTextField.getText().replace("-", ""));
 				} catch (NumberFormatException e) {
 					JOptionPane.showMessageDialog(null, "Por favor digite um valor valido como telefone.\nSomente números.");
 					return;
@@ -221,11 +229,11 @@ public class FrameClient {
 					JOptionPane.showMessageDialog(null, "Por favor digite um nome valido como nome do contato.");
 					return;
 				}
-				client.updateContact(textFieldNameContact.getText(),contactNumber, model.getValueAt(table.getSelectedRow(), 0).toString(), Integer.parseInt(model.getValueAt(table.getSelectedRow(), 1).toString()));
+				client.updateContact(textFieldNameContact.getText(),contactNumber, model.getValueAt(table.getSelectedRow(), 0).toString(), Integer.parseInt(model.getValueAt(table.getSelectedRow(), 1).toString().replace("-", "")));
 				btnAtualizar.setEnabled(false);
 				btnDeletar.setEnabled(false);
 				textFieldNameContact.setText(null);
-				formattedNumberTextField.setText(null);
+				formattedTextField.setText(null);
 
 			}
 		});
@@ -241,7 +249,7 @@ public class FrameClient {
 				btnAtualizar.setEnabled(false);
 				btnDeletar.setEnabled(false);
 				textFieldNameContact.setText(null);
-				formattedNumberTextField.setText(null);
+				formattedTextField.setText(null);
 			}
 		});
 		btnDeletar.setBounds(54, 193, 90, 28);
@@ -256,10 +264,10 @@ public class FrameClient {
 			e.printStackTrace();
 		}
 		
-		formattedNumberTextField = new JFormattedTextField(phoneMask);
-		formattedNumberTextField.setHorizontalAlignment(SwingConstants.CENTER);
-		formattedNumberTextField.setBounds(6, 117, 186, 28);
-		panelContact.add(formattedNumberTextField);
+		formattedTextField = new JFormattedTextField(phoneMask);
+		formattedTextField.setHorizontalAlignment(SwingConstants.CENTER);
+		formattedTextField.setBounds(6, 117, 186, 28);
+		panelContact.add(formattedTextField);
 
 		lblLastUpdate = new JLabel("Atualizado em:");
 		lblLastUpdate.setBounds(17, 264, 98, 16);
@@ -281,7 +289,8 @@ public class FrameClient {
 			model.removeRow(i);
 		}
 		for (String key : list.keySet()) {
-			String [] values = {key, list.get(key).toString()};
+			String [] values = {key, new String(list.get(key).toString().substring(0, 4)+"-"+list.get(key).toString().substring(4, 8))};
+			
 			model.addRow(values);
 		}
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package graphics;
+package com.ldrr.graphics;
 
 import java.awt.EventQueue;
 
@@ -14,9 +14,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
-
-import controller.PhoneBookClient;
-
 import javax.swing.border.TitledBorder;
 import javax.swing.UIManager;
 import javax.swing.JPanel;
@@ -35,7 +32,16 @@ import java.util.TreeMap;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingConstants;
+
+import com.ldrr.controller.PhoneBookClient;
+
 import java.awt.Font;
+
+/**
+ * All source code and required libraries are found at the following link:
+ * https://github.com/lucasdiegorr/phonebook-corba-client
+ * branch: master
+ */
 
 /**
  * @author Lucas Diego Reboucas Rocha
@@ -109,6 +115,8 @@ public class FrameClient {
 				table.clearSelection();
 				textFieldNameContact.setText(null);
 				formattedTextField.setText(null);
+				btnAtualizar.setEnabled(false);
+				btnDeletar.setEnabled(false);
 			}
 		});
 		frame.setResizable(false);
@@ -207,15 +215,6 @@ public class FrameClient {
 				textFieldNameContact.setText(null);
 				formattedTextField.setText(null);
 			}
-
-			private boolean verifyContact(String contactName, int contactNumber) {
-				if (client.getListContacts().containsKey(contactName) || client.getListContacts().containsValue(contactNumber)) {
-					JOptionPane.showMessageDialog(null, "Desculpe mas esse nome já foi cadastrado.");
-					return false;
-				}else {
-					return true;
-				}
-			}
 		});
 		btnAdicionar.setBounds(6, 157, 90, 28);
 		panelContact.add(btnAdicionar);
@@ -260,16 +259,16 @@ public class FrameClient {
 		});
 		btnDeletar.setBounds(54, 193, 90, 28);
 		panelContact.add(btnDeletar);
-		
+
 		MaskFormatter phoneMask = null;
-		
+
 		try {
 			phoneMask = new MaskFormatter("####-####");
 			phoneMask.setPlaceholderCharacter(' ');
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		
+
 		formattedTextField = new JFormattedTextField(phoneMask);
 		formattedTextField.setHorizontalAlignment(SwingConstants.CENTER);
 		formattedTextField.setBounds(6, 117, 186, 28);
@@ -278,11 +277,20 @@ public class FrameClient {
 		lblLastUpdate = new JLabel("Atualizado em:");
 		lblLastUpdate.setBounds(17, 264, 98, 16);
 		frame.getContentPane().add(lblLastUpdate);
-		
+
 		label = new JLabel("");
 		label.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		label.setBounds(17, 292, 185, 16);
 		frame.getContentPane().add(label);
+	}
+
+	private boolean verifyContact(String contactName, int contactNumber) {
+		if (client.getListContacts().containsKey(contactName) || client.getListContacts().containsValue(contactNumber)) {
+			JOptionPane.showMessageDialog(null, "Desculpe mas esse nome já foi cadastrado.");
+			return false;
+		}else {
+			return true;
+		}
 	}
 
 	/**
@@ -297,7 +305,7 @@ public class FrameClient {
 		}
 		for (String key : list.keySet()) {
 			String [] values = {key, new String(list.get(key).toString().substring(0, 4)+"-"+list.get(key).toString().substring(4, 8))};
-			
+
 			model.addRow(values);
 		}
 

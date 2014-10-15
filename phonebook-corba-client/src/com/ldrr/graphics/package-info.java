@@ -6,4 +6,4 @@
  * @email lucas.diegorr@gmail.com
  * @year 2014
  */
-package graphics;
+package com.ldrr.graphics;

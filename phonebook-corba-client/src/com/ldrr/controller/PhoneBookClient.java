@@ -1,7 +1,7 @@
 /**
  * 
  */
-package controller;
+package com.ldrr.controller;
 
 import interfaces.PhoneBookServerInterface;
 import interfaces.PhoneBookServerInterfaceHelper;
@@ -23,6 +23,12 @@ import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
 
 /**
+ * All source code and required libraries are found at the following link:
+ * https://github.com/lucasdiegorr/phonebook-corba-client
+ * branch: master
+ */
+
+/**
  * @author Lucas Diego Reboucas Rocha
  * @email lucas.diegorr@gmail.com
  * @year 2014
@@ -35,6 +41,7 @@ public class PhoneBookClient implements Runnable{
 	private String portNameService;
 	private ORB orb;
 	private boolean isChanged;
+	
 	/**
 	 * @param ip 
 	 * @param port 
@@ -47,6 +54,10 @@ public class PhoneBookClient implements Runnable{
 		this.setListContacts(new TreeMap<String, Integer>());
 	}
 
+	/**
+	 * Inicia a conexão com o servidor
+	 * @return boolean informando de a conexão com o servidor foi realizada
+	 */
 	public boolean init() {
 
 		Properties properties = new Properties();
@@ -68,6 +79,11 @@ public class PhoneBookClient implements Runnable{
 		return true;
 	}
 
+	/**
+	 * Procura as referencias vivas no servidor de nomes. 
+	 * Baseada nessa procura é retornada a referencia para o servidor atual
+	 * @return Object CORBA
+	 */
 	private Object seekReference(){
 		Object objectInterface = null;
 		int index = 0;
@@ -96,6 +112,11 @@ public class PhoneBookClient implements Runnable{
 		return objectInterface;
 	}
 
+	/**
+	 * Insere um contato na lista
+	 * @param contactName
+	 * @param contactNumber
+	 */
 	public void insertContact(String contactName, int contactNumber) {
 		this.getListContacts().put(contactName, contactNumber);
 		this.server.insertContact(contactName, contactNumber);
@@ -130,7 +151,7 @@ public class PhoneBookClient implements Runnable{
 	}
 
 	/**
-	 * 
+	 * Sincroniza a lista
 	 */
 	private void synchronizeList() {
 		try {

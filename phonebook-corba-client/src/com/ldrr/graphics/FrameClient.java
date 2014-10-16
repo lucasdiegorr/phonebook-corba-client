@@ -38,6 +38,8 @@ import com.ldrr.controller.PhoneBookClient;
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * All source code and required libraries are found at the following link:
@@ -96,7 +98,7 @@ public class FrameClient {
 		do {
 			ipAddress = JOptionPane.showInputDialog("Intruduza o endereço no Servidor:");
 		} while ((ipAddress.equals("")) || (ipAddress.isEmpty()) ||(ipAddress == null));
-		this.client = new PhoneBookClient(ipAddress);
+		this.client = new PhoneBookClient(ipAddress, model);
 		if (!client.init()) {
 			JOptionPane.showMessageDialog(null, "Não foi possível contactar o servidor.\nPor favor verifique sua conexão e o endereço fornecido.");
 			System.exit(0);
@@ -111,6 +113,12 @@ public class FrameClient {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				client.removeReference();
+			}
+		});
 		frame.getContentPane().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {

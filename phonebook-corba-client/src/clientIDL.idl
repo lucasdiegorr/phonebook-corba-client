@@ -1,0 +1,5 @@
+module interfaces{
+	interface PhoneBookClientInterface{
+		void updateListContact(in string listContact);
+	};
+};

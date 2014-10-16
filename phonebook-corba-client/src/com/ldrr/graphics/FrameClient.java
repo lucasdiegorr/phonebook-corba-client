@@ -36,6 +36,8 @@ import javax.swing.SwingConstants;
 import com.ldrr.controller.PhoneBookClient;
 
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /**
  * All source code and required libraries are found at the following link:
@@ -148,6 +150,7 @@ public class FrameClient {
 		panelTable.setLayout(null);
 
 		table = new JTable();
+		table.setToolTipText("Selecione um contato para poder atualizá-lo ou removê-lo.");
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -201,8 +204,9 @@ public class FrameClient {
 						return;
 					}
 
-					if (verifyContact(contactName,contactNumber)) {
-						client.insertContact(contactName, contactNumber);
+
+					if (verifyContact(contactName.toUpperCase(),contactNumber)) {
+						client.insertContact(contactName.toUpperCase(), contactNumber);
 						String[] values = { textFieldNameContact.getText(),
 								formattedTextField.getText() };
 						model.addRow(values);
@@ -245,7 +249,7 @@ public class FrameClient {
 		btnAtualizar.setBounds(102, 157, 90, 28);
 		panelContact.add(btnAtualizar);
 
-		btnDeletar = new JButton("Deletar");
+		btnDeletar = new JButton("Remover");
 		btnDeletar.setEnabled(false);
 		btnDeletar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -270,6 +274,37 @@ public class FrameClient {
 		}
 
 		formattedTextField = new JFormattedTextField(phoneMask);
+		formattedTextField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent key) {
+				if (key.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (!textFieldNameContact.getText().equals("") && !textFieldNameContact.getText().isEmpty()) {
+						String contactName = textFieldNameContact.getText();
+						int contactNumber = 0;
+						try {
+							contactNumber = Integer.parseInt(formattedTextField.getText().replace("-", ""));
+						} catch (NumberFormatException e) {
+							JOptionPane.showMessageDialog(null, "Por favor insira um telefone válido.\n Somente números.");
+							return;
+						}
+
+
+						if (verifyContact(contactName.toUpperCase(),contactNumber)) {
+							client.insertContact(contactName.toUpperCase(), contactNumber);
+							String[] values = { textFieldNameContact.getText(),
+									formattedTextField.getText() };
+							model.addRow(values);
+							refreshTable();
+						}
+
+					}else {
+						JOptionPane.showMessageDialog(null, "Por favor digite um nome não nulo.");
+					}
+					textFieldNameContact.setText(null);
+					formattedTextField.setText(null);
+				}
+			}
+		});
 		formattedTextField.setHorizontalAlignment(SwingConstants.CENTER);
 		formattedTextField.setBounds(6, 117, 186, 28);
 		panelContact.add(formattedTextField);
@@ -285,9 +320,16 @@ public class FrameClient {
 	}
 
 	private boolean verifyContact(String contactName, int contactNumber) {
-		if (client.getListContacts().containsKey(contactName) || client.getListContacts().containsValue(contactNumber)) {
+		if (client.getListContacts().containsKey(contactName)) {
 			JOptionPane.showMessageDialog(null, "Desculpe mas esse nome já foi cadastrado.");
 			return false;
+		}else if (client.getListContacts().containsValue(contactNumber)) {
+			int confirmation = JOptionPane.showConfirmDialog(null, "Este número está associado a outro número. Gostaria de inserí-lo mesmo assim?");
+			if (confirmation == JOptionPane.OK_OPTION) {
+				return true;
+			}else{
+				return false;
+			}
 		}else {
 			return true;
 		}
